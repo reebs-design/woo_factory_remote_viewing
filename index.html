@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Remote Viewing App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Inter:wght@400&family=Lato:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="pages-container">
+
+      <!-- PAGE 1: Home -->
+      <main class="page page-home active" id="page-home">
+        <div class="top-bar">
+          <div class="logo">
+            <img src="assets/woo logo.svg" alt="Woo logo" width="52" height="53">
+          </div>
+          <div class="profile-avatar">
+            <img src="assets/Profile2.png" alt="Profile" width="36" height="36">
+          </div>
+        </div>
+        <div class="content">
+          <section class="inspiration">
+            <div class="inspiration-header">
+              <span class="section-label">Today's inspiration</span>
+            </div>
+            <h1 class="quote" id="daily-quote"></h1>
+          </section>
+          <section class="hit-rate">
+            <div class="hit-rate-header">
+              <span class="section-label">Hit rate over time</span>
+              <span class="section-label link" id="btn-view-history">View session history <span class="link-chevron">›</span></span>
+            </div>
+            <div class="chart-card">
+              <div class="chart-area">
+                <div class="chart-labels">
+                  <span class="chart-label">100%</span>
+                  <span class="chart-label">66%</span>
+                  <span class="chart-label">33%</span>
+                  <span class="chart-label">0</span>
+                </div>
+                <div class="chart-grid">
+                  <div class="grid-line"></div>
+                  <div class="grid-line"></div>
+                  <div class="grid-line"></div>
+                  <div class="grid-line"></div>
+                </div>
+                <div class="chart-bars" id="chart-bars"></div>
+              </div>
+              <div class="chart-x-labels" id="chart-x-labels"></div>
+            </div>
+          </section>
+          <section class="resources">
+            <span class="section-label">Remote viewing resources</span>
+            <div class="resources-scroll">
+              <div class="resource-card">
+                <div class="resource-image">
+                  <img src="assets/card-image-1.png" alt="Introduction to Remote Viewing">
+                </div>
+                <p class="resource-text">Introduction to Remote Viewing by The Monroe Institute</p>
+              </div>
+              <div class="resource-card">
+                <div class="resource-image">
+                  <img src="assets/card-image-2.png" alt="Binaural beats playlist">
+                </div>
+                <p class="resource-text">Spotify binural beats tracks to listen to during practice</p>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="sticky-bottom">
+          <button class="primary-button" id="btn-start-session">New remote viewing session</button>
+        </div>
+      </main>
+
+      <!-- PAGE: Session History -->
+      <main class="page page-history" id="page-history">
+        <div class="history-header">
+          <button class="back-button" id="btn-back-history" aria-label="Go back">
+            <img src="assets/back-circle.svg" alt="Back" width="30" height="30">
+          </button>
+          <span class="history-title">Session history</span>
+        </div>
+        <div class="history-body" id="history-body"></div>
+      </main>
+
+      <!-- PAGE 2: Session Settings -->
+      <main class="page page-settings" id="page-settings">
+        <div class="settings-header">
+          <button class="close-button" id="btn-back" aria-label="Close">
+            <img src="assets/close-circle.svg" alt="" width="30" height="30">
+            <img src="assets/close-x.svg" alt="Close" class="close-x-icon">
+          </button>
+          <span class="settings-title">Settings</span>
+        </div>
+        <div class="settings-content">
+          <div class="setting-block">
+            <div class="setting-row">
+              <div class="setting-label-group">
+                <div class="setting-icon">
+                  <img src="assets/targets.svg" alt="" width="24" height="24">
+                </div>
+                <span class="setting-name">Show multiple targets</span>
+              </div>
+              <label class="toggle on" id="toggle-targets">
+                <div class="toggle-track">
+                  <div class="toggle-thumb"></div>
+                </div>
+              </label>
+            </div>
+            <p class="setting-description">After each session, you'll be shown 6 potential targets to choose the one that best matches your viewing. For those who prefer not to see multiple options—believing it may influence perception—this feature can be turned off.</p>
+          </div>
+          <div class="setting-block">
+            <div class="setting-row">
+              <div class="setting-label-group">
+                <div class="setting-icon">
+                  <img src="assets/type.svg" alt="" width="20" height="20">
+                </div>
+                <span class="setting-name">Pick target type</span>
+              </div>
+              <label class="toggle" id="toggle-type">
+                <div class="toggle-track">
+                  <div class="toggle-thumb"></div>
+                </div>
+              </label>
+            </div>
+            <p class="setting-description">Target types like location, object, or person can help guide focus and interpretation. However, some prefer to leave the type undefined to avoid influencing perception with expectations.</p>
+          </div>
+        </div>
+        <div class="sticky-bottom" id="settings-bottom">
+          <div class="bottom-default">
+            <button class="primary-button" id="btn-begin-session">Begin session</button>
+          </div>
+          <div class="bottom-target-types hidden">
+            <button class="primary-button target-type-btn">Location target</button>
+            <button class="primary-button target-type-btn">Object target</button>
+            <button class="primary-button target-type-btn">Person target</button>
+          </div>
+        </div>
+      </main>
+
+      <!-- PAGE 3: Active Session -->
+      <main class="page page-session" id="page-session">
+        <div class="session-header">
+          <button class="back-button" id="btn-close-session" aria-label="Go back">
+            <img src="assets/back-circle.svg" alt="Back" width="30" height="30">
+          </button>
+          <span class="session-title" id="session-title">Target 00000000</span>
+          <button class="done-pill" id="btn-done">Done</button>
+        </div>
+        <div class="session-body" id="session-body">
+          <div class="target-card">
+            <div class="target-illustration">
+              <img src="assets/Illustration.svg" alt="Meditation illustration">
+            </div>
+            <span class="target-label">Target</span>
+            <span class="target-number" id="session-target-number">00000000</span>
+          </div>
+          <p class="session-instructions">Take a moment to breathe and center your attention on the target. Speak each property you sense out loud, pausing at least 3 seconds between them.</p>
+          <div class="entries-list" id="entries-list"></div>
+        </div>
+        <div class="session-input-bar">
+          <div class="listening-field" id="listening-field">
+            <span class="listening-text" id="listening-text">Listening....</span>
+          </div>
+          <button class="mic-button" id="btn-mic" aria-label="Microphone">
+            <img src="assets/mic-circle.svg" alt="" class="mic-bg">
+            <img src="assets/microphone.svg" alt="Mic" class="mic-icon">
+          </button>
+        </div>
+      </main>
+
+      <!-- PAGE 4: Target Selection -->
+      <main class="page page-selection" id="page-selection">
+        <div class="selection-header">
+          <button class="back-button" id="btn-close-selection" aria-label="Go back">
+            <img src="assets/back-circle.svg" alt="Back" width="30" height="30">
+          </button>
+          <span class="selection-title" id="selection-title-text">Target selection</span>
+          <button class="done-pill" id="btn-next-selection">Next</button>
+        </div>
+        <div class="selection-loading" id="selection-loading">
+          <img src="assets/loading-dots.gif" alt="Loading" class="loading-dots-gif">
+        </div>
+        <div class="selection-body" id="selection-body" style="display:none;">
+          <p class="selection-prompt">Choose the target</p>
+          <div class="photo-grid" id="photo-grid"></div>
+        </div>
+      </main>
+
+      <!-- PAGE 5: Target Analysis / Review -->
+      <main class="page page-review" id="page-review">
+        <div class="review-header">
+          <button class="close-button" id="btn-close-review" aria-label="Close">
+            <img src="assets/close-circle.svg" alt="" width="30" height="30">
+            <img src="assets/close-x.svg" alt="Close" class="close-x-icon">
+          </button>
+          <span class="review-title">Target analysis</span>
+          <button class="done-pill" id="btn-next-review">Next</button>
+        </div>
+        <div class="review-body">
+          <div class="review-target-circle">
+            <img src="" alt="Target" id="review-target-img">
+            <div class="review-target-loading" id="review-target-loading" style="display:none;">
+              <img src="assets/loading-dots.gif" alt="Loading" class="review-loading-gif">
+              <span class="review-loading-text">Loading target</span>
+            </div>
+          </div>
+          <div class="review-counter-row">
+            <span class="review-counter-label">Review your properties</span>
+            <span class="review-counter-pill" id="review-counter-pill">0 of 0</span>
+          </div>
+          <div class="review-cards-scroll" id="review-cards-scroll"></div>
+        </div>
+      </main>
+
+      <!-- PAGE 6: Final Results -->
+      <main class="page page-results" id="page-results">
+        <div class="results-header">
+          <button class="close-button" id="btn-close-results" aria-label="Close">
+            <img src="assets/close-circle.svg" alt="" width="30" height="30">
+            <img src="assets/close-x.svg" alt="Close" class="close-x-icon">
+          </button>
+          <button class="back-button" id="btn-back-results" aria-label="Go back" style="display:none;">
+            <img src="assets/back-circle.svg" alt="Back" width="30" height="30">
+          </button>
+          <span class="results-title">Final results</span>
+          <button class="done-pill" id="btn-done-results">Done</button>
+        </div>
+        <div class="results-body">
+          <div class="results-progress-bar">
+            <span class="progress-pill progress-pill-hits" id="progress-hits">0</span>
+            <div class="progress-track">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <span class="progress-pill progress-pill-total" id="progress-total">0</span>
+          </div>
+          <div class="results-stats-row">
+            <div class="results-stat-card">
+              <span class="stat-value" id="stat-percent">0%</span>
+              <span class="stat-label" id="stat-label">0/0 properties matched the target</span>
+            </div>
+            <div class="results-stat-card">
+              <img src="assets/check-circle.svg" alt="" class="stat-icon" id="stat-target-icon">
+              <span class="stat-label" id="stat-target-label">You identified the target correctly</span>
+            </div>
+          </div>
+          <div class="results-target-circle">
+            <img src="" alt="Target" id="results-target-img">
+          </div>
+          <p class="results-section-label">Self-reviewed properties</p>
+          <div class="results-cards-scroll" id="results-cards-scroll"></div>
+        </div>
+      </main>
+
+      <!-- Result Modal -->
+      <div class="result-overlay" id="result-overlay">
+        <div class="result-modal" id="result-modal">
+          <p class="result-title" id="result-title"></p>
+          <p class="result-body" id="result-body"></p>
+          <button class="result-btn" id="btn-continue-review">Continue to review</button>
+        </div>
+      </div>
+
+      <div class="page-overlay" id="page-overlay"></div>
+
+    </div>
+  </div>
+  <script src="config.js"></script>
+  <script>
+    const dailyQuotes = [
+      'Beyond your thoughts is a vast knowing waiting patiently for you to return',
+      'Consciousness is not something you have, it is something you are — the universe experiencing itself',
+      'The mind can reach across space and time because it was never truly bound by either',
+      'What you perceive as reality is only the thinnest layer of something far more vast',
+      'You are not a drop in the ocean — you are the entire ocean in a single drop',
+      'The quieter you become, the more you are able to hear what lies beyond the visible world',
+      'Reality is merely an illusion, albeit a very persistent one',
+      'Everything we call real is made of things that cannot be regarded as real',
+      'The universe is not outside of you — look inside yourself, everything you want you already are',
+      'We are all connected to each other biologically, to the earth chemically, and to the rest of the universe atomically',
+      'Your mind is a garden, your thoughts are the seeds — you can grow flowers or you can grow weeds',
+      'The field of infinite possibilities exists beyond what your five senses can perceive',
+      'Attention is the rarest and purest form of generosity you can offer the universe',
+      'There are more things in heaven and earth than are dreamt of in your philosophy',
+      'The only true voyage of discovery consists not in seeking new landscapes but in having new eyes',
+      'We do not see things as they are — we see things as we are',
+      'The cosmos is within us — we are made of star stuff, we are a way for the universe to know itself',
+      'In the middle of difficulty lies opportunity to perceive beyond the ordinary',
+      'What lies behind us and what lies before us are tiny matters compared to what lies within us',
+      'If the doors of perception were cleansed, everything would appear as it is — infinite',
+      'The intuitive mind is a sacred gift and the rational mind is a faithful servant',
+      'Look deep into nature and then you will understand everything better',
+      'Not only is the universe stranger than we think, it is stranger than we can think',
+      'The eye through which I see God is the same eye through which God sees me',
+      'There is a voice that does not use words — listen',
+      'All matter is merely energy condensed to a slow vibration — we are all one consciousness',
+      'The real voyage of discovery is not in seeking new lands but in seeing with new eyes',
+      'Imagination is more important than knowledge — knowledge is limited, imagination encircles the world',
+      'Every atom in your body came from a star that exploded — you are literally made of stardust',
+      'The meeting of two eternities, the past and future, is precisely the present moment',
+      'Who looks outside dreams — who looks inside awakens'
+    ];
+    const dayIndex = new Date().getDate() % dailyQuotes.length;
+    document.getElementById('daily-quote').textContent = dailyQuotes[dayIndex];
+
+    // Page transitions
+    const pageHome = document.getElementById('page-home');
+    const pageSettings = document.getElementById('page-settings');
+
+    document.getElementById('btn-start-session').addEventListener('click', () => {
+      pageSettings.classList.add('slide-in');
+    });
+
+    document.getElementById('btn-back').addEventListener('click', () => {
+      pageSettings.classList.remove('slide-in');
+    });
+
+    // Toggles
+    const toggleTargets = document.getElementById('toggle-targets');
+    const toggleType = document.getElementById('toggle-type');
+    const settingsBottom = document.getElementById('settings-bottom');
+    const bottomDefault = settingsBottom.querySelector('.bottom-default');
+    const bottomTargetTypes = settingsBottom.querySelector('.bottom-target-types');
+
+    toggleTargets.addEventListener('click', () => {
+      toggleTargets.classList.toggle('on');
+    });
+
+    toggleType.addEventListener('click', () => {
+      toggleType.classList.toggle('on');
+      const isOn = toggleType.classList.contains('on');
+      if (isOn) {
+        bottomDefault.classList.add('hidden');
+        bottomTargetTypes.classList.remove('hidden');
+        settingsBottom.classList.add('expanded');
+      } else {
+        bottomDefault.classList.remove('hidden');
+        bottomTargetTypes.classList.add('hidden');
+        settingsBottom.classList.remove('expanded');
+      }
+    });
+
+    // Target system
+    const pageSession = document.getElementById('page-session');
+    const sessionTitle = document.getElementById('session-title');
+    const sessionTargetNumber = document.getElementById('session-target-number');
+
+    function getNextTargetId() {
+      let id = parseInt(localStorage.getItem('woo_target_counter') || '0', 10);
+      id++;
+      localStorage.setItem('woo_target_counter', id.toString());
+      return id;
+    }
+
+    function generateTargetNumber() {
+      return String(Math.floor(Math.random() * 100000000)).padStart(8, '0');
+    }
+
+    function saveTarget(target) {
+      const history = JSON.parse(localStorage.getItem('woo_target_history') || '[]');
+      history.push(target);
+      localStorage.setItem('woo_target_history', JSON.stringify(history));
+    }
+
+    async function fetchTarget(type) {
+      const queries = CONFIG.queries[type];
+      const query = queries[Math.floor(Math.random() * queries.length)];
+      const page = Math.floor(Math.random() * 10) + 1;
+
+      const response = await fetch(
+        `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=15&page=${page}`,
+        { headers: { Authorization: CONFIG.pexelsApiKey } }
+      );
+
+      if (!response.ok) throw new Error('Pexels API error');
+
+      const data = await response.json();
+      if (!data.photos || data.photos.length === 0) throw new Error('No photos found');
+
+      const photo = data.photos[Math.floor(Math.random() * data.photos.length)];
+      const targetId = getNextTargetId();
+      const targetNumber = generateTargetNumber();
+
+      const target = {
+        id: targetId,
+        number: targetNumber,
+        type: type,
+        imageUrl: photo.src.large,
+        photographer: photo.photographer,
+        pexelsUrl: photo.url,
+        timestamp: Date.now()
+      };
+
+      saveTarget(target);
+      return target;
+    }
+
+    // Speech recognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let silenceTimer = null;
+    let sessionEntries = [];
+    let shouldListen = false;
+    let currentTranscript = '';
+    const entriesList = document.getElementById('entries-list');
+    const listeningText = document.getElementById('listening-text');
+    const listeningField = document.getElementById('listening-field');
+    const micButton = document.getElementById('btn-mic');
+    const sessionBody = document.getElementById('session-body');
+    const SILENCE_MS = 2000;
+
+    function createRecognition() {
+      const rec = new SpeechRecognition();
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.lang = 'en-US';
+
+      rec.onstart = () => {
+        micButton.classList.add('recording');
+        listeningField.classList.add('active');
+        if (!currentTranscript) {
+          listeningText.textContent = 'Listening....';
+          listeningText.style.color = '';
+        }
+      };
+
+      rec.onaudiostart = () => {
+        if (!currentTranscript) {
+          listeningText.textContent = 'Listening....';
+        }
+      };
+
+      rec.onresult = (event) => {
+        clearTimeout(silenceTimer);
+
+        let interim = '';
+        let finalText = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const t = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalText += t;
+          } else {
+            interim += t;
+          }
+        }
+
+        const show = (finalText || interim).trim();
+        if (show) {
+          currentTranscript = show;
+          listeningText.textContent = currentTranscript;
+          listeningText.style.color = '#ffffff';
+        }
+
+        silenceTimer = setTimeout(commitEntry, SILENCE_MS);
+      };
+
+      rec.onerror = (event) => {
+        if (event.error === 'no-speech') return;
+        if (event.error === 'aborted') return;
+        if (event.error === 'not-allowed') {
+          listeningText.textContent = 'Mic access denied - check browser settings';
+          listeningText.style.color = '#ff6b6b';
+          shouldListen = false;
+          micButton.classList.remove('recording');
+          listeningField.classList.remove('active');
+        }
+      };
+
+      rec.onend = () => {
+        if (shouldListen) {
+          setTimeout(() => {
+            if (shouldListen) {
+              try {
+                recognition = createRecognition();
+                recognition.start();
+              } catch(e) {}
+            }
+          }, 200);
+        } else {
+          micButton.classList.remove('recording');
+          listeningField.classList.remove('active');
+        }
+      };
+
+      return rec;
+    }
+
+    function commitEntry() {
+      if (currentTranscript) {
+        addEntry(currentTranscript);
+        currentTranscript = '';
+        listeningText.textContent = 'Listening....';
+        listeningText.style.color = '';
+      }
+    }
+
+    function startRecognition() {
+      if (!SpeechRecognition) {
+        listeningText.textContent = 'Speech API not available in this browser';
+        listeningText.style.color = '#ff6b6b';
+        return;
+      }
+
+      stopRecognition();
+      shouldListen = true;
+      currentTranscript = '';
+
+      try {
+        recognition = createRecognition();
+        recognition.start();
+      } catch(e) {
+        listeningText.textContent = 'Tap mic to start';
+        listeningText.style.color = '#ff6b6b';
+      }
+    }
+
+    function stopRecognition() {
+      shouldListen = false;
+      clearTimeout(silenceTimer);
+      commitEntry();
+      if (recognition) {
+        recognition.onend = null;
+        try { recognition.abort(); } catch(e) {}
+        recognition = null;
+      }
+      micButton.classList.remove('recording');
+      listeningField.classList.remove('active');
+      listeningText.textContent = 'Listening....';
+      listeningText.style.color = '';
+    }
+
+    function addEntry(text) {
+      const entry = { text, timestamp: Date.now() };
+      sessionEntries.push(entry);
+
+      const bubble = document.createElement('div');
+      bubble.className = 'entry-bubble';
+      bubble.textContent = text;
+      entriesList.appendChild(bubble);
+
+      sessionBody.scrollTop = sessionBody.scrollHeight;
+
+      updateTargetEntries();
+    }
+
+    function updateTargetEntries() {
+      if (!window._currentTarget) return;
+      const history = JSON.parse(localStorage.getItem('woo_target_history') || '[]');
+      const idx = history.findIndex(t => t.id === window._currentTarget.id);
+      if (idx !== -1) {
+        history[idx].entries = sessionEntries;
+        localStorage.setItem('woo_target_history', JSON.stringify(history));
+      }
+    }
+
+    // Selection page
+    const pageSelection = document.getElementById('page-selection');
+    const photoGrid = document.getElementById('photo-grid');
+    let selectedPhotoUrl = null;
+    let cachedSelectionPhotos = null;
+    let cachedSelectionTargetId = null;
+
+    async function fetchDistractorPhotos(targetType, count, mixedTypes) {
+      const allTypes = ['location', 'object', 'person'];
+      const photos = [];
+
+      for (let i = 0; i < count; i++) {
+        const type = mixedTypes ? allTypes[Math.floor(Math.random() * allTypes.length)] : targetType;
+        const queries = CONFIG.queries[type] || CONFIG.queries[allTypes[Math.floor(Math.random() * 3)]];
+        const query = queries[Math.floor(Math.random() * queries.length)];
+        const page = Math.floor(Math.random() * 10) + 1;
+        try {
+          const response = await fetch(
+            `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=5&page=${page}`,
+            { headers: { Authorization: CONFIG.pexelsApiKey } }
+          );
+          if (response.ok) {
+            const data = await response.json();
+            if (data.photos && data.photos.length > 0) {
+              const photo = data.photos[Math.floor(Math.random() * data.photos.length)];
+              photos.push(photo.src.large);
+            }
+          }
+        } catch(e) {}
+      }
+      return photos;
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    const selectionLoading = document.getElementById('selection-loading');
+    const selectionBody = document.getElementById('selection-body');
+    const selectionTitleText = document.getElementById('selection-title-text');
+
+    function preloadImages(urls) {
+      return Promise.all(urls.map(url => new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(url);
+        img.onerror = () => resolve(url);
+        img.src = url;
+      })));
+    }
+
+    function showSelectionLoading() {
+      selectionTitleText.textContent = 'Target selection';
+      selectionLoading.style.display = 'flex';
+      selectionBody.style.display = 'none';
+    }
+
+    function showSelectionGrid() {
+      selectionTitleText.textContent = 'Target selection';
+      selectionLoading.style.display = 'none';
+      selectionBody.style.display = '';
+    }
+
+    function renderSelectionGrid(allPhotos) {
+      photoGrid.innerHTML = '';
+      selectedPhotoUrl = null;
+      window._selectedIsTarget = false;
+
+      allPhotos.forEach(photo => {
+        const circle = document.createElement('div');
+        circle.className = 'photo-circle';
+        const img = document.createElement('img');
+        img.src = photo.url;
+        img.alt = photo.isTarget ? 'Target photo' : 'Photo option';
+        circle.appendChild(img);
+
+        circle.addEventListener('click', () => {
+          document.querySelectorAll('.photo-circle').forEach(c => c.classList.remove('selected'));
+          circle.classList.add('selected');
+          selectedPhotoUrl = photo.url;
+          window._selectedIsTarget = photo.isTarget;
+        });
+
+        photoGrid.appendChild(circle);
+      });
+    }
+
+    async function openSelectionPage() {
+      const target = window._currentTarget;
+      if (!target) return;
+
+      pageSession.classList.add('slide-out');
+
+      // Reuse cached photos if same target session
+      if (cachedSelectionPhotos && cachedSelectionTargetId === target.id) {
+        showSelectionGrid();
+        renderSelectionGrid(cachedSelectionPhotos);
+        pageSelection.classList.add('slide-in');
+        return;
+      }
+
+      showSelectionLoading();
+      pageSelection.classList.add('slide-in');
+
+      const useMixedTypes = !toggleType.classList.contains('on');
+      const distractors = await fetchDistractorPhotos(target.type, 5, useMixedTypes);
+
+      const allPhotos = shuffleArray([
+        { url: target.imageUrl, isTarget: true },
+        ...distractors.map(url => ({ url, isTarget: false }))
+      ]);
+
+      cachedSelectionPhotos = allPhotos;
+      cachedSelectionTargetId = target.id;
+
+      await preloadImages(allPhotos.map(p => p.url));
+
+      renderSelectionGrid(allPhotos);
+      showSelectionGrid();
+    }
+
+    function closeSelection() {
+      pageSelection.classList.remove('slide-in');
+      pageSession.classList.remove('slide-out');
+    }
+
+    // Result modal
+    const resultOverlay = document.getElementById('result-overlay');
+    const resultTitle = document.getElementById('result-title');
+    const resultBody = document.getElementById('result-body');
+
+    function showResultModal(isCorrect) {
+      if (isCorrect) {
+        resultTitle.textContent = 'You correctly identified the target!';
+        resultTitle.classList.add('correct');
+        resultTitle.classList.remove('incorrect');
+        resultBody.textContent = 'This will count towards your overall score.';
+      } else {
+        resultTitle.textContent = 'Incorrect target';
+        resultTitle.classList.remove('correct');
+        resultTitle.classList.add('incorrect');
+        resultBody.textContent = "But don't worry, your score is made up from hits on individual properties that you correctly identified";
+      }
+      resultOverlay.classList.add('visible');
+    }
+
+    function hideResultModal() {
+      resultOverlay.classList.remove('visible');
+    }
+
+    // Review page
+    const pageReview = document.getElementById('page-review');
+    const reviewTargetImg = document.getElementById('review-target-img');
+    const reviewCounterPill = document.getElementById('review-counter-pill');
+    const reviewCardsScroll = document.getElementById('review-cards-scroll');
+    let reviewRatings = {};
+    let reviewTotal = 0;
+
+    function updateReviewCounter() {
+      const rated = Object.keys(reviewRatings).length;
+      reviewCounterPill.textContent = rated + ' of ' + reviewTotal;
+    }
+
+    function openReviewPage() {
+      const target = window._currentTarget;
+      if (!target) return;
+
+      reviewSkippedSelection = false;
+      document.getElementById('review-target-loading').style.display = 'none';
+      reviewTargetImg.src = target.imageUrl;
+      reviewCardsScroll.innerHTML = '';
+      reviewRatings = {};
+
+      const entries = sessionEntries.length ? sessionEntries : (target.entries || []);
+      reviewTotal = entries.length;
+      updateReviewCounter();
+
+      entries.forEach((entry, idx) => {
+        const entryText = typeof entry === 'string' ? entry : entry.text;
+        const card = document.createElement('div');
+        card.className = 'review-card';
+
+        const btnsRow = document.createElement('div');
+        btnsRow.className = 'review-card-buttons';
+
+        ['Invalid', 'Miss', 'Hit'].forEach(label => {
+          const btn = document.createElement('button');
+          btn.className = 'review-rating-btn';
+          btn.textContent = label;
+          btn.addEventListener('click', () => {
+            btnsRow.querySelectorAll('.review-rating-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            reviewRatings[idx] = label.toLowerCase();
+            updateReviewCounter();
+          });
+          btnsRow.appendChild(btn);
+        });
+
+        const textBox = document.createElement('div');
+        textBox.className = 'review-card-text';
+        const p = document.createElement('p');
+        p.textContent = entryText;
+        textBox.appendChild(p);
+
+        card.appendChild(btnsRow);
+        card.appendChild(textBox);
+        reviewCardsScroll.appendChild(card);
+      });
+
+      pageSelection.classList.add('slide-out');
+      pageReview.classList.add('slide-in');
+    }
+
+    let reviewSkippedSelection = false;
+
+    function openReviewDirect() {
+      const target = window._currentTarget;
+      if (!target) return;
+
+      reviewSkippedSelection = true;
+      window._selectedIsTarget = true;
+
+      reviewTargetImg.src = '';
+      const loader = document.getElementById('review-target-loading');
+      loader.style.display = 'flex';
+
+      reviewCardsScroll.innerHTML = '';
+      reviewRatings = {};
+
+      const entries = sessionEntries.length ? sessionEntries : (target.entries || []);
+      reviewTotal = entries.length;
+      updateReviewCounter();
+
+      entries.forEach((entry, idx) => {
+        const entryText = typeof entry === 'string' ? entry : entry.text;
+        const card = document.createElement('div');
+        card.className = 'review-card';
+
+        const btnsRow = document.createElement('div');
+        btnsRow.className = 'review-card-buttons';
+
+        ['Invalid', 'Miss', 'Hit'].forEach(label => {
+          const btn = document.createElement('button');
+          btn.className = 'review-rating-btn';
+          btn.textContent = label;
+          btn.addEventListener('click', () => {
+            btnsRow.querySelectorAll('.review-rating-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            reviewRatings[idx] = label.toLowerCase();
+            updateReviewCounter();
+          });
+          btnsRow.appendChild(btn);
+        });
+
+        const textBox = document.createElement('div');
+        textBox.className = 'review-card-text';
+        const p = document.createElement('p');
+        p.textContent = entryText;
+        textBox.appendChild(p);
+
+        card.appendChild(btnsRow);
+        card.appendChild(textBox);
+        reviewCardsScroll.appendChild(card);
+      });
+
+      pageSession.classList.add('slide-out');
+      pageReview.classList.add('slide-in');
+
+      setTimeout(() => {
+        reviewTargetImg.src = target.imageUrl;
+        const img = new Image();
+        img.onload = () => { loader.style.display = 'none'; };
+        img.src = target.imageUrl;
+        setTimeout(() => { loader.style.display = 'none'; }, 3000);
+      }, 1500);
+    }
+
+    function closeReview() {
+      pageReview.classList.remove('slide-in');
+      if (reviewSkippedSelection) {
+        pageSession.classList.remove('slide-out');
+        reviewSkippedSelection = false;
+      } else {
+        pageSelection.classList.remove('slide-out');
+      }
+    }
+
+    // Final Results page
+    const pageResults = document.getElementById('page-results');
+    const progressHits = document.getElementById('progress-hits');
+    const progressTotal = document.getElementById('progress-total');
+    const progressFill = document.getElementById('progress-fill');
+    const statPercent = document.getElementById('stat-percent');
+    const statLabel = document.getElementById('stat-label');
+    const statTargetIcon = document.getElementById('stat-target-icon');
+    const statTargetLabel = document.getElementById('stat-target-label');
+    const resultsTargetImg = document.getElementById('results-target-img');
+    const resultsCardsScroll = document.getElementById('results-cards-scroll');
+
+    function calculateScore() {
+      const ratings = Object.values(reviewRatings);
+      const invalidCount = ratings.filter(r => r === 'invalid').length;
+      const hitCount = ratings.filter(r => r === 'hit').length;
+      const validTotal = reviewTotal - invalidCount;
+      const percent = validTotal > 0 ? Math.round((hitCount / validTotal) * 100) : 0;
+      return { hitCount, validTotal, percent };
+    }
+
+    function openResultsPage() {
+      const target = window._currentTarget;
+      if (!target) return;
+
+      const { hitCount, validTotal, percent } = calculateScore();
+      const identifiedCorrectly = !!window._selectedIsTarget;
+      lastSessionScore = percent;
+
+      progressHits.textContent = hitCount;
+      progressTotal.textContent = validTotal;
+      statPercent.textContent = percent + '%';
+      statLabel.textContent = hitCount + '/' + validTotal + ' properties matched the target';
+
+      const statTargetCard = statTargetIcon.parentElement;
+      if (reviewSkippedSelection) {
+        statTargetCard.style.display = 'none';
+      } else {
+        statTargetCard.style.display = '';
+        if (identifiedCorrectly) {
+          statTargetIcon.src = 'assets/check-circle.svg';
+          statTargetCard.classList.remove('incorrect');
+          statTargetLabel.textContent = 'You identified the target correctly';
+        } else {
+          statTargetIcon.src = 'assets/miss_target.svg';
+          statTargetCard.classList.add('incorrect');
+          statTargetLabel.textContent = 'You did not correctly identify the target';
+        }
+      }
+
+      setTimeout(() => {
+        progressFill.style.width = (validTotal > 0 ? (hitCount / validTotal) * 100 : 0) + '%';
+      }, 100);
+
+      resultsTargetImg.src = target.imageUrl;
+
+      resultsCardsScroll.innerHTML = '';
+      const entries = sessionEntries.length ? sessionEntries : (target.entries || []);
+      entries.forEach((entry, idx) => {
+        const entryText = typeof entry === 'string' ? entry : entry.text;
+        const rating = reviewRatings[idx];
+        const card = document.createElement('div');
+        card.className = 'review-card';
+
+        const btnsRow = document.createElement('div');
+        btnsRow.className = 'review-card-buttons';
+
+        ['Invalid', 'Miss', 'Hit'].forEach(label => {
+          const btn = document.createElement('button');
+          btn.className = 'review-rating-btn';
+          if (rating === label.toLowerCase()) btn.classList.add('active');
+          btn.textContent = label;
+          btn.disabled = true;
+          btnsRow.appendChild(btn);
+        });
+
+        const textBox = document.createElement('div');
+        textBox.className = 'review-card-text';
+        const p = document.createElement('p');
+        p.textContent = entryText;
+        textBox.appendChild(p);
+
+        card.appendChild(btnsRow);
+        card.appendChild(textBox);
+        resultsCardsScroll.appendChild(card);
+      });
+
+      document.getElementById('btn-close-results').style.display = '';
+      document.getElementById('btn-back-results').style.display = 'none';
+      document.getElementById('btn-done-results').style.display = '';
+      resultsFromHistory = false;
+
+      pageReview.classList.add('slide-out');
+      pageResults.classList.add('slide-in');
+    }
+
+    function closeResults() {
+      pageResults.classList.remove('slide-in');
+      pageReview.classList.remove('slide-out');
+      progressFill.style.width = '0%';
+    }
+
+    let lastSessionScore = null;
+
+    function aggregateChartData() {
+      const raw = JSON.parse(localStorage.getItem('woo_chart_scores') || '[]');
+      const byDate = {};
+      const dateOrder = [];
+      raw.forEach(s => {
+        if (!byDate[s.dateKey]) {
+          byDate[s.dateKey] = { day: s.day, scores: [] };
+          dateOrder.push(s.dateKey);
+        }
+        byDate[s.dateKey].scores.push(s.percent);
+      });
+      return dateOrder.map(key => {
+        const d = byDate[key];
+        const avg = Math.round(d.scores.reduce((a, b) => a + b, 0) / d.scores.length);
+        return { day: d.day, percent: avg };
+      });
+    }
+
+    function renderChart(entries, animateLastBar) {
+      const chartBars = document.getElementById('chart-bars');
+      const chartXLabels = document.getElementById('chart-x-labels');
+      chartBars.innerHTML = '';
+      chartXLabels.innerHTML = '';
+
+      entries.forEach((e, i) => {
+        const isLast = i === entries.length - 1;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'bar-wrapper';
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        if (animateLastBar && isLast) {
+          bar.classList.add('bar-new');
+          bar.style.height = '0%';
+        } else {
+          bar.style.height = Math.max(e.percent, 2) + '%';
+        }
+        wrapper.appendChild(bar);
+        chartBars.appendChild(wrapper);
+
+        const label = document.createElement('span');
+        label.textContent = e.day;
+        chartXLabels.appendChild(label);
+
+        if (animateLastBar && isLast) {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              bar.style.height = Math.max(e.percent, 2) + '%';
+            });
+          });
+        }
+      });
+    }
+
+    function seedDummyChartData() {
+      const existing = JSON.parse(localStorage.getItem('woo_chart_scores') || '[]');
+      if (existing.length > 0) return;
+
+      const now = new Date();
+      const dummyDays = [
+        { daysAgo: 21, percent: 38 },
+        { daysAgo: 18, percent: 48 },
+        { daysAgo: 15, percent: 40 },
+        { daysAgo: 11, percent: 55 },
+        { daysAgo: 8,  percent: 45 },
+        { daysAgo: 5,  percent: 30 },
+        { daysAgo: 2,  percent: 55 }
+      ];
+
+      const seeds = dummyDays.map(d => {
+        const date = new Date(now);
+        date.setDate(date.getDate() - d.daysAgo);
+        return {
+          percent: d.percent,
+          day: date.getDate(),
+          dateKey: date.toISOString().slice(0, 10)
+        };
+      });
+
+      localStorage.setItem('woo_chart_scores', JSON.stringify(seeds));
+    }
+
+    seedDummyChartData();
+    renderChart(aggregateChartData(), false);
+
+    function addChartEntry(percent) {
+      const now = new Date();
+      const day = now.getDate();
+      const dateKey = now.toISOString().slice(0, 10);
+
+      const raw = JSON.parse(localStorage.getItem('woo_chart_scores') || '[]');
+      raw.push({ percent, day, dateKey });
+      localStorage.setItem('woo_chart_scores', JSON.stringify(raw));
+
+      renderChart(aggregateChartData(), true);
+    }
+
+    function saveSessionResult() {
+      const target = window._currentTarget;
+      if (!target) return;
+      const { hitCount, validTotal, percent } = calculateScore();
+      const identifiedCorrectly = !!window._selectedIsTarget;
+
+      const entries = sessionEntries.map((e, i) => ({
+        text: typeof e === 'string' ? e : e.text,
+        rating: reviewRatings[i] || null
+      }));
+
+      const result = {
+        id: target.id,
+        number: target.number,
+        type: target.type,
+        imageUrl: target.imageUrl,
+        percent,
+        hitCount,
+        validTotal,
+        identifiedCorrectly,
+        multipleTargets: !reviewSkippedSelection,
+        entries,
+        timestamp: Date.now()
+      };
+
+      const history = JSON.parse(localStorage.getItem('woo_session_results') || '[]');
+      history.unshift(result);
+      localStorage.setItem('woo_session_results', JSON.stringify(history));
+    }
+
+    function resetAllPages() {
+      pageResults.classList.remove('slide-in', 'slide-out');
+      pageReview.classList.remove('slide-in', 'slide-out');
+      pageSelection.classList.remove('slide-in', 'slide-out');
+      pageSession.classList.remove('slide-in', 'slide-out');
+      pageSettings.classList.remove('slide-in', 'slide-out');
+      progressFill.style.width = '0%';
+      reviewSkippedSelection = false;
+      document.getElementById('review-target-loading').style.display = 'none';
+      statTargetIcon.parentElement.style.display = '';
+    }
+
+    function closeAllPages() {
+      if (lastSessionScore !== null) {
+        saveSessionResult();
+      }
+
+      stopRecognition();
+
+      const overlay = document.getElementById('page-overlay');
+      overlay.style.transition = 'none';
+      overlay.classList.add('active');
+      void overlay.offsetHeight;
+
+      const allPages = [pageSettings, pageSession, pageSelection, pageReview, pageResults];
+      allPages.forEach(p => {
+        p.style.transition = 'none';
+        p.classList.remove('slide-in', 'slide-out');
+      });
+      void pageSettings.offsetHeight;
+      allPages.forEach(p => { p.style.transition = ''; });
+
+      progressFill.style.width = '0%';
+      reviewSkippedSelection = false;
+      document.getElementById('review-target-loading').style.display = 'none';
+      statTargetIcon.parentElement.style.display = '';
+
+      overlay.style.transition = '';
+      void overlay.offsetHeight;
+      overlay.classList.remove('active');
+
+      let cleaned = false;
+      const onFaded = () => {
+        if (cleaned) return;
+        cleaned = true;
+        overlay.removeEventListener('transitionend', onFaded);
+
+        if (lastSessionScore !== null) {
+          addChartEntry(lastSessionScore);
+          lastSessionScore = null;
+        }
+      };
+      overlay.addEventListener('transitionend', onFaded);
+      setTimeout(onFaded, 500);
+    }
+
+    document.getElementById('btn-close-results').addEventListener('click', closeAllPages);
+    document.getElementById('btn-done-results').addEventListener('click', closeAllPages);
+
+    document.getElementById('btn-back-results').addEventListener('click', () => {
+      pageResults.classList.remove('slide-in');
+      pageHistory.classList.remove('slide-out');
+      progressFill.style.width = '0%';
+      resultsFromHistory = false;
+    });
+
+    // Session History page
+    const pageHistory = document.getElementById('page-history');
+    const historyBody = document.getElementById('history-body');
+
+    function formatSessionDate(ts) {
+      const d = new Date(ts);
+      const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const day = days[d.getDay()];
+      const month = months[d.getMonth()];
+      const date = d.getDate();
+      let hours = d.getHours();
+      const mins = String(d.getMinutes()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      return day + ', ' + month + ' ' + date + ',\n' + hours + ':' + mins + ' ' + ampm;
+    }
+
+    function createProgressRing(percent) {
+      const radius = 25;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (percent / 100) * circumference;
+
+      const ring = document.createElement('div');
+      ring.className = 'history-ring';
+      ring.innerHTML =
+        '<span class="history-ring-percent">' + percent + '%</span>' +
+        '<div class="history-ring-svg-wrap">' +
+          '<svg viewBox="0 0 60 60">' +
+            '<circle class="ring-bg" cx="30" cy="30" r="' + radius + '"/>' +
+            '<circle class="ring-fill" cx="30" cy="30" r="' + radius + '"' +
+            ' stroke-dasharray="' + circumference + '"' +
+            ' stroke-dashoffset="' + offset + '"/>' +
+          '</svg>' +
+        '</div>';
+      return ring;
+    }
+
+    function openHistory() {
+      const results = JSON.parse(localStorage.getItem('woo_session_results') || '[]');
+      historyBody.innerHTML = '';
+
+      if (results.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'history-empty';
+        empty.textContent = 'No sessions yet. Complete a session to see your history.';
+        historyBody.appendChild(empty);
+      } else {
+        results.forEach(r => {
+          const card = document.createElement('div');
+          card.className = 'history-card';
+
+          const thumb = document.createElement('div');
+          thumb.className = 'history-thumb';
+          const thumbImg = document.createElement('img');
+          thumbImg.src = r.imageUrl;
+          thumbImg.alt = '';
+          thumb.appendChild(thumbImg);
+
+          const info = document.createElement('div');
+          info.className = 'history-info';
+
+          const dateP = document.createElement('p');
+          dateP.className = 'history-date';
+          dateP.textContent = formatSessionDate(r.timestamp);
+
+          const details = document.createElement('div');
+          details.className = 'history-details';
+
+          const typeName = r.type ? r.type.charAt(0).toUpperCase() + r.type.slice(1) : 'Unknown';
+          const line1 = document.createElement('div');
+          line1.textContent = 'Target #' + r.number;
+          const line2 = document.createElement('div');
+          line2.textContent = 'Type: ' + typeName;
+          details.appendChild(line1);
+          details.appendChild(line2);
+
+          if (r.multipleTargets !== false) {
+            const line3 = document.createElement('div');
+            line3.textContent = 'Multiple targets shown';
+            details.appendChild(line3);
+
+            const status = document.createElement('div');
+            status.className = 'target-status' + (r.identifiedCorrectly ? '' : ' miss');
+            const statusIcon = document.createElement('img');
+            statusIcon.src = r.identifiedCorrectly ? 'assets/check-circle.svg' : 'assets/WrongOnly.svg';
+            statusIcon.alt = '';
+            const statusText = document.createElement('span');
+            statusText.textContent = r.identifiedCorrectly ? 'Target correctly identified' : 'Target not identified';
+            status.appendChild(statusIcon);
+            status.appendChild(statusText);
+            details.appendChild(status);
+          }
+
+          info.appendChild(dateP);
+          info.appendChild(details);
+
+          const ring = createProgressRing(r.percent);
+          const svgWrap = ring.querySelector('.history-ring-svg-wrap');
+
+          if (r.multipleTargets !== false) {
+            const ringIcon = document.createElement('img');
+            ringIcon.className = 'history-ring-icon' + (r.identifiedCorrectly ? '' : ' incorrect');
+            ringIcon.src = r.identifiedCorrectly ? 'assets/check-circle.svg' : 'assets/miss_target.svg';
+            ringIcon.alt = '';
+            svgWrap.appendChild(ringIcon);
+          }
+
+          card.style.cursor = 'pointer';
+          card.addEventListener('click', () => openResultsFromHistory(r));
+
+          card.appendChild(thumb);
+          card.appendChild(info);
+          card.appendChild(ring);
+          historyBody.appendChild(card);
+        });
+      }
+
+      pageHome.classList.add('slide-out');
+      pageHistory.classList.add('slide-in');
+    }
+
+    let resultsFromHistory = false;
+
+    function openResultsFromHistory(r) {
+      resultsFromHistory = true;
+
+      progressHits.textContent = r.hitCount;
+      progressTotal.textContent = r.validTotal;
+      statPercent.textContent = r.percent + '%';
+      statLabel.textContent = r.hitCount + '/' + r.validTotal + ' properties matched the target';
+
+      const statTargetCard = statTargetIcon.parentElement;
+      if (r.multipleTargets === false) {
+        statTargetCard.style.display = 'none';
+      } else {
+        statTargetCard.style.display = '';
+        if (r.identifiedCorrectly) {
+          statTargetIcon.src = 'assets/check-circle.svg';
+          statTargetCard.classList.remove('incorrect');
+          statTargetLabel.textContent = 'You identified the target correctly';
+        } else {
+          statTargetIcon.src = 'assets/miss_target.svg';
+          statTargetCard.classList.add('incorrect');
+          statTargetLabel.textContent = 'You did not correctly identify the target';
+        }
+      }
+
+      setTimeout(() => {
+        progressFill.style.width = (r.validTotal > 0 ? (r.hitCount / r.validTotal) * 100 : 0) + '%';
+      }, 100);
+
+      resultsTargetImg.src = r.imageUrl;
+
+      resultsCardsScroll.innerHTML = '';
+      if (r.entries && r.entries.length) {
+        r.entries.forEach(entry => {
+          const card = document.createElement('div');
+          card.className = 'review-card';
+
+          const btnsRow = document.createElement('div');
+          btnsRow.className = 'review-card-buttons';
+
+          ['Invalid', 'Miss', 'Hit'].forEach(label => {
+            const btn = document.createElement('button');
+            btn.className = 'review-rating-btn';
+            if (entry.rating === label.toLowerCase()) btn.classList.add('active');
+            btn.textContent = label;
+            btn.disabled = true;
+            btnsRow.appendChild(btn);
+          });
+
+          const textBox = document.createElement('div');
+          textBox.className = 'review-card-text';
+          const p = document.createElement('p');
+          p.textContent = entry.text;
+          textBox.appendChild(p);
+
+          card.appendChild(btnsRow);
+          card.appendChild(textBox);
+          resultsCardsScroll.appendChild(card);
+        });
+      }
+
+      document.getElementById('btn-close-results').style.display = 'none';
+      document.getElementById('btn-back-results').style.display = '';
+      document.getElementById('btn-done-results').style.display = 'none';
+
+      pageHistory.classList.add('slide-out');
+      pageResults.classList.add('slide-in');
+    }
+
+    function closeHistory() {
+      pageHome.classList.remove('slide-out');
+      pageHistory.classList.remove('slide-in');
+    }
+
+    document.getElementById('btn-view-history').addEventListener('click', openHistory);
+    document.getElementById('btn-back-history').addEventListener('click', closeHistory);
+
+    document.getElementById('btn-close-review').addEventListener('click', () => {
+      stopRecognition();
+      resetAllPages();
+    });
+
+    document.getElementById('btn-next-review').addEventListener('click', () => {
+      openResultsPage();
+    });
+
+    document.getElementById('btn-continue-review').addEventListener('click', () => {
+      hideResultModal();
+      openReviewPage();
+    });
+
+    document.getElementById('btn-close-selection').addEventListener('click', closeSelection);
+    document.getElementById('btn-next-selection').addEventListener('click', () => {
+      if (!selectedPhotoUrl) {
+        alert('Please select a target first');
+        return;
+      }
+      showResultModal(window._selectedIsTarget);
+    });
+
+    function openSession(target) {
+      sessionTitle.textContent = 'Target ' + target.number;
+      sessionTargetNumber.textContent = target.number;
+      window._currentTarget = target;
+      sessionEntries = [];
+      entriesList.innerHTML = '';
+      cachedSelectionPhotos = null;
+      cachedSelectionTargetId = null;
+      pageSettings.classList.remove('slide-in');
+      pageSettings.classList.add('slide-out');
+      pageSession.classList.add('slide-in');
+      setTimeout(() => startRecognition(), 400);
+    }
+
+    function closeSession() {
+      stopRecognition();
+      updateTargetEntries();
+      pageSession.classList.remove('slide-in');
+      pageSettings.classList.remove('slide-out');
+      pageSettings.classList.add('slide-in');
+    }
+
+    document.getElementById('btn-close-session').addEventListener('click', closeSession);
+    document.getElementById('btn-done').addEventListener('click', () => {
+      stopRecognition();
+      updateTargetEntries();
+      if (toggleTargets.classList.contains('on')) {
+        openSelectionPage();
+      } else {
+        openReviewDirect();
+      }
+    });
+
+    micButton.addEventListener('click', () => {
+      if (shouldListen) {
+        stopRecognition();
+      } else {
+        startRecognition();
+      }
+    });
+
+    // Wire target type buttons
+    const targetTypeBtns = document.querySelectorAll('.target-type-btn');
+    const typeMap = ['location', 'object', 'person'];
+
+    targetTypeBtns.forEach((btn, i) => {
+      btn.addEventListener('click', async () => {
+        btn.classList.add('loading');
+        btn.textContent = 'Loading...';
+        try {
+          const target = await fetchTarget(typeMap[i]);
+          openSession(target);
+        } catch (err) {
+          alert('Failed to fetch target. Please try again.');
+        } finally {
+          const labels = ['Location target', 'Object target', 'Person target'];
+          btn.textContent = labels[i];
+          btn.classList.remove('loading');
+        }
+      });
+    });
+
+    document.getElementById('btn-begin-session').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-begin-session');
+      btn.classList.add('loading');
+      btn.textContent = 'Loading...';
+      try {
+        const randomType = typeMap[Math.floor(Math.random() * typeMap.length)];
+        const target = await fetchTarget(randomType);
+        openSession(target);
+      } catch (err) {
+        alert('Failed to fetch target. Please try again.');
+      } finally {
+        btn.textContent = 'Begin session';
+        btn.classList.remove('loading');
+      }
+    });
+  </script>
+</body>
+</html>
