@@ -1350,13 +1350,13 @@ body {
   padding: 16px;
   display: flex;
   gap: 12px;
-  align-items: center;
+  align-items: flex-start;
   position: relative;
 }
 
 .history-thumb {
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
@@ -1432,7 +1432,7 @@ body {
 
 .history-ring .ring-bg {
   fill: none;
-  stroke: #1e1e1e;
+  stroke: #042121;
   stroke-width: 5;
 }
 
