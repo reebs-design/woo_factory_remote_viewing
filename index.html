@@ -15,15 +15,15 @@
 
       <!-- PAGE 1: Home -->
       <main class="page page-home active" id="page-home">
-        <div class="top-bar">
-          <div class="logo">
-            <img src="assets/woo logo.svg" alt="Woo logo" width="52" height="53">
-          </div>
-          <div class="profile-avatar">
-            <img src="assets/Profile2.png" alt="Profile" width="36" height="36">
-          </div>
-        </div>
         <div class="content">
+          <div class="top-bar">
+            <div class="logo">
+              <img src="assets/woo logo.svg" alt="Woo logo" width="52" height="53">
+            </div>
+            <div class="profile-avatar">
+              <img src="assets/Profile2.png" alt="Profile" width="36" height="36">
+            </div>
+          </div>
           <section class="inspiration">
             <div class="inspiration-header">
               <span class="section-label">Today's inspiration</span>
@@ -501,12 +501,15 @@
       rec.onerror = (event) => {
         if (event.error === 'no-speech') return;
         if (event.error === 'aborted') return;
-        if (event.error === 'not-allowed') {
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
           listeningText.textContent = 'Mic access denied - check browser settings';
           listeningText.style.color = '#ff6b6b';
           shouldListen = false;
           micButton.classList.remove('recording');
           listeningField.classList.remove('active');
+        } else if (event.error === 'network') {
+          listeningText.textContent = 'Network error - check your connection';
+          listeningText.style.color = '#ff6b6b';
         }
       };
 
@@ -1419,7 +1422,8 @@
       pageSettings.classList.remove('slide-in');
       pageSettings.classList.add('slide-out');
       pageSession.classList.add('slide-in');
-      setTimeout(() => startRecognition(), 400);
+      listeningText.textContent = 'Tap mic to start listening';
+      listeningText.style.color = '';
     }
 
     function closeSession() {
