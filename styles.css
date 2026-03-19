@@ -20,12 +20,15 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  min-height: 100dvh;
   font-family: 'Open Sans', sans-serif;
 }
 
 .phone-frame {
   width: 375px;
-  height: 812px;
+  height: 100vh;
+  height: 100dvh;
+  max-height: -webkit-fill-available;
   position: relative;
   overflow: hidden;
   background: var(--bg);
