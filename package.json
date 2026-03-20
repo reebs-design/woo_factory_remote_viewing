@@ -1,0 +1,29 @@
+{
+  "name": "woo-factory",
+  "version": "1.0.0",
+  "description": "",
+  "main": "config.js",
+  "scripts": {
+    "build": "rm -rf www && mkdir -p www/vendor && cp index.html styles.css www/ && cp -r assets www/ && cp vendor/capacitor.js vendor/speech-recognition.js www/vendor/ && test -f config.js && cp config.js www/ || true",
+    "sync": "npm run build && npx cap sync ios",
+    "update-vendor": "cp node_modules/@capacitor/core/dist/capacitor.js vendor/ && cp node_modules/@capacitor-community/speech-recognition/dist/plugin.js vendor/speech-recognition.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reebs-design/woo_factory_remote_viewing.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/reebs-design/woo_factory_remote_viewing/issues"
+  },
+  "homepage": "https://github.com/reebs-design/woo_factory_remote_viewing#readme",
+  "dependencies": {
+    "@capacitor-community/speech-recognition": "^7.0.1",
+    "@capacitor/cli": "^8.2.0",
+    "@capacitor/core": "^8.2.0",
+    "@capacitor/ios": "^8.2.0"
+  }
+}

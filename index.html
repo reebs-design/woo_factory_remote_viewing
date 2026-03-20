@@ -294,6 +294,8 @@
 
     </div>
   </div>
+  <script src="vendor/capacitor.js"></script>
+  <script src="vendor/speech-recognition.js"></script>
   <script src="config.js" onerror="window.CONFIG=null"></script>
   <script>
     const dailyQuotes = [
@@ -463,11 +465,16 @@
     }
 
     // Speech recognition
+    const isCapacitor = !!window.Capacitor && window.Capacitor.isNativePlatform();
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     let silenceTimer = null;
     let sessionEntries = [];
     let shouldListen = false;
+    let nativePartialListenerRegistered = false;
+    let nativeRestartChain = Promise.resolve();
+    let nativeRestartInProgress = false;
+    let suppressWebPartialsUntil = 0;
     let currentTranscript = '';
     let confirmedTranscript = '';
     const entriesList = document.getElementById('entries-list');
@@ -477,6 +484,174 @@
     const sessionBody = document.getElementById('session-body');
     const SILENCE_MS = 2000;
 
+    // --- Native Capacitor speech recognition (requires capacitor.js + speech-recognition.js) ---
+    function getNativeSpeech() {
+      return window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SpeechRecognition;
+    }
+
+    function nativePartialResultsListener(data) {
+      if (!shouldListen || nativeRestartInProgress) return;
+      clearTimeout(silenceTimer);
+      const text = (data.matches && data.matches[0]) ? String(data.matches[0]).trim() : '';
+      if (text) {
+        currentTranscript = text;
+        listeningText.textContent = currentTranscript;
+        listeningText.style.color = '#ffffff';
+      }
+      silenceTimer = setTimeout(commitEntry, SILENCE_MS);
+    }
+
+    const NATIVE_RESTART_DELAY_MS = 400;
+
+    async function ensureNativePartialListener(NativeSpeech) {
+      if (nativePartialListenerRegistered) return;
+      await NativeSpeech.addListener('partialResults', nativePartialResultsListener);
+      await NativeSpeech.addListener('speechError', (data) => {
+        if (!shouldListen || nativeRestartInProgress) return;
+        const msg = data && data.message ? String(data.message) : 'Unknown error';
+        console.error('Native speech error', msg);
+        clearTimeout(silenceTimer);
+        listeningText.textContent = 'Listening paused — tap mic to continue';
+        listeningText.style.color = '#ff6b6b';
+        shouldListen = false;
+        micButton.classList.remove('recording');
+        listeningField.classList.remove('active');
+      });
+      nativePartialListenerRegistered = true;
+    }
+
+    async function startNativeSpeechEngine(NativeSpeech) {
+      await NativeSpeech.start({
+        language: 'en-US',
+        partialResults: true,
+        popup: false,
+        maxResults: 5
+      });
+    }
+
+    async function attachAndStartNativeSpeech(NativeSpeech) {
+      await ensureNativePartialListener(NativeSpeech);
+      await startNativeSpeechEngine(NativeSpeech);
+    }
+
+    /** Serialize restarts so overlapping commits don't race removeListener/stop/start. */
+    function restartNativeSpeechSession() {
+      nativeRestartChain = nativeRestartChain
+        .then(() => restartNativeSpeechSessionImpl())
+        .catch((e) => {
+          console.error('Native speech restart chain error', e);
+        });
+    }
+
+    async function restartNativeSpeechSessionImpl() {
+      const NativeSpeech = getNativeSpeech();
+      if (!NativeSpeech || !shouldListen) {
+        nativeRestartInProgress = false;
+        return;
+      }
+      nativeRestartInProgress = true;
+      try {
+        clearTimeout(silenceTimer);
+        try {
+          await NativeSpeech.stop();
+        } catch (e) {
+          console.warn('Speech stop during restart', e);
+        }
+        if (!shouldListen) return;
+        await new Promise((r) => setTimeout(r, NATIVE_RESTART_DELAY_MS));
+        if (!shouldListen) return;
+        try {
+          await startNativeSpeechEngine(NativeSpeech);
+        } catch (e) {
+          console.error('Speech start after restart failed', e);
+          listeningText.textContent = 'Listening paused — tap mic to continue';
+          listeningText.style.color = '#ff6b6b';
+          shouldListen = false;
+          micButton.classList.remove('recording');
+          listeningField.classList.remove('active');
+        }
+      } finally {
+        nativeRestartInProgress = false;
+      }
+    }
+
+    async function startNativeRecognition() {
+      const NativeSpeech = getNativeSpeech();
+      if (!NativeSpeech) {
+        listeningText.textContent = 'Speech plugin not loaded — run npm run sync';
+        listeningText.style.color = '#ff6b6b';
+        return;
+      }
+
+      try { await NativeSpeech.removeAllListeners(); } catch(e) {}
+      nativePartialListenerRegistered = false;
+      try { await NativeSpeech.stop(); } catch(e) {}
+
+      let avail = { available: true };
+      try {
+        avail = await NativeSpeech.available();
+      } catch(e) {}
+      if (!avail.available) {
+        listeningText.textContent = 'Speech not available here — use a real iPhone (Simulator has limits)';
+        listeningText.style.color = '#ff6b6b';
+        return;
+      }
+
+      let permResult;
+      try {
+        permResult = await NativeSpeech.requestPermissions();
+      } catch(e) {
+        console.error('Speech requestPermissions failed', e);
+        listeningText.textContent = 'Could not request permissions: ' + (e && e.message ? e.message : 'native plugin missing — rebuild iOS in Xcode');
+        listeningText.style.color = '#ff6b6b';
+        return;
+      }
+      if (permResult.speechRecognition !== 'granted') {
+        listeningText.textContent = 'Mic access denied — enable in Settings';
+        listeningText.style.color = '#ff6b6b';
+        return;
+      }
+
+      shouldListen = true;
+      currentTranscript = '';
+      confirmedTranscript = '';
+      micButton.classList.add('recording');
+      listeningField.classList.add('active');
+      listeningText.textContent = 'Listening....';
+      listeningText.style.color = '';
+
+      try {
+        await attachAndStartNativeSpeech(NativeSpeech);
+      } catch(e) {
+        console.error('Native speech start failed', e);
+        listeningText.textContent = 'Could not start listening — try a physical device';
+        listeningText.style.color = '#ff6b6b';
+        shouldListen = false;
+        nativePartialListenerRegistered = false;
+        micButton.classList.remove('recording');
+        listeningField.classList.remove('active');
+        try { await NativeSpeech.removeAllListeners(); } catch(err) {}
+      }
+    }
+
+    async function stopNativeRecognition() {
+      shouldListen = false;
+      clearTimeout(silenceTimer);
+      nativeRestartChain = Promise.resolve();
+      commitEntry();
+      const NativeSpeech = getNativeSpeech();
+      if (NativeSpeech) {
+        try { await NativeSpeech.stop(); } catch(e) {}
+        try { await NativeSpeech.removeAllListeners(); } catch(e) {}
+      }
+      nativePartialListenerRegistered = false;
+      micButton.classList.remove('recording');
+      listeningField.classList.remove('active');
+      listeningText.textContent = 'Listening....';
+      listeningText.style.color = '';
+    }
+
+    // --- Web Speech API (browser fallback) ---
     function createRecognition() {
       const rec = new SpeechRecognition();
       rec.continuous = true;
@@ -499,6 +674,7 @@
       };
 
       rec.onresult = (event) => {
+        if (Date.now() < suppressWebPartialsUntil) return;
         clearTimeout(silenceTimer);
 
         let interim = '';
@@ -557,16 +733,32 @@
     }
 
     function commitEntry() {
-      if (currentTranscript) {
-        addEntry(currentTranscript);
-        currentTranscript = '';
-        confirmedTranscript = '';
-        listeningText.textContent = 'Listening....';
-        listeningText.style.color = '';
+      const text = (currentTranscript || '').trim();
+      if (!text) return;
+      clearTimeout(silenceTimer);
+      /* Block stale partials: native may still emit the committed phrase until stop() runs. */
+      if (isCapacitor && shouldListen) {
+        nativeRestartInProgress = true;
+      } else if (shouldListen) {
+        suppressWebPartialsUntil = Date.now() + 350;
+      }
+      currentTranscript = '';
+      confirmedTranscript = '';
+      listeningText.textContent = 'Listening....';
+      listeningText.style.color = '';
+      addEntry(text);
+      if (isCapacitor && shouldListen) {
+        void restartNativeSpeechSession();
       }
     }
 
+    // --- Unified start/stop that routes to native or web ---
     function startRecognition() {
+      if (isCapacitor) {
+        startNativeRecognition();
+        return;
+      }
+
       if (!SpeechRecognition) {
         listeningText.textContent = 'Speech API not available in this browser';
         listeningText.style.color = '#ff6b6b';
@@ -588,6 +780,11 @@
     }
 
     function stopRecognition() {
+      if (isCapacitor) {
+        stopNativeRecognition();
+        return;
+      }
+
       shouldListen = false;
       clearTimeout(silenceTimer);
       commitEntry();
@@ -633,29 +830,57 @@
     let cachedSelectionPhotos = null;
     let cachedSelectionTargetId = null;
 
-    async function fetchDistractorPhotos(targetType, count, mixedTypes) {
+    async function fetchOneUniquePhotoUrl(targetType, mixedTypes, usedUrls) {
       const allTypes = ['location', 'object', 'person'];
-      const photos = [];
-
-      for (let i = 0; i < count; i++) {
-        const type = mixedTypes ? allTypes[Math.floor(Math.random() * allTypes.length)] : targetType;
-        const queries = IMAGE_QUERIES[type] || IMAGE_QUERIES[allTypes[Math.floor(Math.random() * 3)]];
-        const query = queries[Math.floor(Math.random() * queries.length)];
+      const type = mixedTypes ? allTypes[Math.floor(Math.random() * allTypes.length)] : targetType;
+      const queries = IMAGE_QUERIES[type] || IMAGE_QUERIES[allTypes[Math.floor(Math.random() * 3)]];
+      const query = queries[Math.floor(Math.random() * queries.length)];
+      try {
+        const results = await fetchFromOpenverse(query, 20);
+        shuffleArray(results);
+        for (const r of results) {
+          const u = r.url;
+          if (u && !usedUrls.has(u)) return u;
+        }
+      } catch(e) {}
+      if (hasPexels()) {
         try {
-          const results = await fetchFromOpenverse(query, 5);
-          const pick = results[Math.floor(Math.random() * results.length)];
-          photos.push(pick.url);
-        } catch(e) {
-          if (hasPexels()) {
-            try {
-              const pPhotos = await fetchFromPexels(query, 5);
-              const pick = pPhotos[Math.floor(Math.random() * pPhotos.length)];
-              photos.push(pick.src.large);
-            } catch(e2) {}
+          const pPhotos = await fetchFromPexels(query, 20);
+          shuffleArray(pPhotos);
+          for (const p of pPhotos) {
+            const u = p.src.large;
+            if (u && !usedUrls.has(u)) return u;
           }
+        } catch(e2) {}
+      }
+      return null;
+    }
+
+    async function fetchDistractorPhotos(targetType, count, mixedTypes, excludeUrls) {
+      const usedUrls = new Set(excludeUrls || []);
+      const photos = [];
+      let attempts = 0;
+      const maxAttempts = count * 30;
+      while (photos.length < count && attempts < maxAttempts) {
+        attempts++;
+        const url = await fetchOneUniquePhotoUrl(targetType, mixedTypes, usedUrls);
+        if (url) {
+          usedUrls.add(url);
+          photos.push(url);
         }
       }
       return photos;
+    }
+
+    function selectionPhotosAreValid(allPhotos, targetUrl) {
+      if (!allPhotos || allPhotos.length !== 6) return false;
+      const urls = allPhotos.map(p => p.url);
+      const unique = new Set(urls);
+      if (unique.size !== 6) return false;
+      const targetCount = allPhotos.filter(p => p.isTarget).length;
+      if (targetCount !== 1) return false;
+      const targetPhoto = allPhotos.find(p => p.isTarget);
+      return targetPhoto && targetPhoto.url === targetUrl;
     }
 
     function shuffleArray(arr) {
@@ -721,8 +946,9 @@
 
       pageSession.classList.add('slide-out');
 
-      // Reuse cached photos if same target session
-      if (cachedSelectionPhotos && cachedSelectionTargetId === target.id) {
+      // Reuse cached photos if same target session and grid is valid (no dupes)
+      if (cachedSelectionPhotos && cachedSelectionTargetId === target.id &&
+          selectionPhotosAreValid(cachedSelectionPhotos, target.imageUrl)) {
         showSelectionGrid();
         renderSelectionGrid(cachedSelectionPhotos);
         pageSelection.classList.add('slide-in');
@@ -733,12 +959,28 @@
       pageSelection.classList.add('slide-in');
 
       const useMixedTypes = !toggleType.classList.contains('on');
-      const distractors = await fetchDistractorPhotos(target.type, 5, useMixedTypes);
+      const exclude = new Set([target.imageUrl].filter(Boolean));
+      const distractors = await fetchDistractorPhotos(target.type, 5, useMixedTypes, exclude);
 
-      const allPhotos = shuffleArray([
+      let allPhotos = shuffleArray([
         { url: target.imageUrl, isTarget: true },
         ...distractors.map(url => ({ url, isTarget: false }))
       ]);
+
+      if (!selectionPhotosAreValid(allPhotos, target.imageUrl)) {
+        const used = new Set([target.imageUrl]);
+        allPhotos = [{ url: target.imageUrl, isTarget: true }];
+        let guard = 0;
+        while (allPhotos.length < 6 && guard < 80) {
+          guard++;
+          const url = await fetchOneUniquePhotoUrl(target.type, useMixedTypes, used);
+          if (url) {
+            used.add(url);
+            allPhotos.push({ url, isTarget: false });
+          }
+        }
+        allPhotos = shuffleArray(allPhotos);
+      }
 
       cachedSelectionPhotos = allPhotos;
       cachedSelectionTargetId = target.id;
@@ -1313,7 +1555,7 @@
             const status = document.createElement('div');
             status.className = 'target-status' + (r.identifiedCorrectly ? '' : ' miss');
             const statusIcon = document.createElement('img');
-            statusIcon.src = r.identifiedCorrectly ? 'assets/check-circle.svg' : 'assets/WrongOnly.svg';
+            statusIcon.src = r.identifiedCorrectly ? 'assets/check.svg' : 'assets/WrongOnly.svg';
             statusIcon.alt = '';
             const statusText = document.createElement('span');
             statusText.textContent = r.identifiedCorrectly ? 'Target correctly identified' : 'Target not identified';
@@ -1331,7 +1573,7 @@
           if (r.multipleTargets !== false) {
             const ringIcon = document.createElement('img');
             ringIcon.className = 'history-ring-icon' + (r.identifiedCorrectly ? '' : ' incorrect');
-            ringIcon.src = r.identifiedCorrectly ? 'assets/check-circle.svg' : 'assets/miss-teal.svg';
+            ringIcon.src = r.identifiedCorrectly ? 'assets/check-circle.svg' : 'assets/check-circle-off.svg';
             ringIcon.alt = '';
             svgWrap.appendChild(ringIcon);
           }

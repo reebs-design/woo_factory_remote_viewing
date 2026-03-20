@@ -99,8 +99,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 41px 16px 0 16px;
+  padding: 55px 16px 0 16px;
   flex-shrink: 0;
+  height: 134px;
 }
 
 .logo {
@@ -397,7 +398,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 61px 16px 34px;
+  padding: 75px 16px 34px;
   flex-shrink: 0;
 }
 
@@ -548,9 +549,10 @@ body {
 .session-header {
   display: flex;
   align-items: center;
-  padding: 55px 16px 14px;
+  padding: 69px 16px 14px;
   flex-shrink: 0;
   position: relative;
+  height: 134px;
 }
 
 .close-button {
@@ -786,7 +788,7 @@ body {
 .selection-header {
   display: flex;
   align-items: center;
-  padding: 55px 16px 14px;
+  padding: 69px 16px 14px;
   flex-shrink: 0;
 }
 
@@ -962,7 +964,7 @@ body {
 .review-header {
   display: flex;
   align-items: center;
-  padding: 55px 16px 14px;
+  padding: 69px 16px 14px;
   flex-shrink: 0;
 }
 
@@ -1149,7 +1151,7 @@ body {
 .results-header {
   display: flex;
   align-items: center;
-  padding: 55px 16px 24px;
+  padding: 69px 16px 24px;
   flex-shrink: 0;
 }
 
@@ -1328,7 +1330,7 @@ body {
 .history-header {
   display: flex;
   align-items: center;
-  padding: 55px 16px 14px;
+  padding: 69px 16px 14px;
   gap: 12px;
   flex-shrink: 0;
 }
