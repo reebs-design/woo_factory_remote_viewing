@@ -57,18 +57,42 @@
           <section class="resources">
             <span class="section-label">Remote viewing resources</span>
             <div class="resources-scroll">
-              <div class="resource-card">
+              <a class="resource-card" href="https://www.cia.gov/readingroom/collection/stargate" target="_blank" rel="noopener">
                 <div class="resource-image">
-                  <img src="assets/card-image-1.png" alt="Introduction to Remote Viewing">
+                  <img src="assets/resource-1.jpg" alt="CIA Stargate Collection">
                 </div>
-                <p class="resource-text">Introduction to Remote Viewing by The Monroe Institute</p>
-              </div>
-              <div class="resource-card">
+                <p class="resource-text">CIA's declassified Stargate Collection — the original remote viewing documents</p>
+              </a>
+              <a class="resource-card" href="https://www.remoteviewed.com/a-beginners-guide-to-remote-viewing/" target="_blank" rel="noopener">
                 <div class="resource-image">
-                  <img src="assets/card-image-2.png" alt="Binaural beats playlist">
+                  <img src="assets/resource-2.jpg" alt="Beginner's guide">
                 </div>
-                <p class="resource-text">Spotify binural beats tracks to listen to during practice</p>
-              </div>
+                <p class="resource-text">A beginner's guide to remote viewing — protocols, history, and how to start</p>
+              </a>
+              <a class="resource-card" href="https://woobiz.net/3-remote-viewing-exercises-for-beginners/" target="_blank" rel="noopener">
+                <div class="resource-image">
+                  <img src="assets/resource-3.jpg" alt="RV exercises">
+                </div>
+                <p class="resource-text">3 remote viewing exercises for beginners to build your skills</p>
+              </a>
+              <a class="resource-card" href="https://uapf.substack.com/p/the-art-of-remote-viewing-a-step" target="_blank" rel="noopener">
+                <div class="resource-image">
+                  <img src="assets/resource-4.jpg" alt="Step by step guide">
+                </div>
+                <p class="resource-text">Step-by-step guide based on CIA's Project Stargate methodology</p>
+              </a>
+              <a class="resource-card" href="https://www.remoteview.ing/" target="_blank" rel="noopener">
+                <div class="resource-image">
+                  <img src="assets/resource-5.jpg" alt="Remote viewing community">
+                </div>
+                <p class="resource-text">Explore the world beyond sight — remote viewing community and practice tools</p>
+              </a>
+              <a class="resource-card" href="https://open.spotify.com/search/binaural%20beats%20remote%20viewing" target="_blank" rel="noopener">
+                <div class="resource-image">
+                  <img src="assets/resource-6.jpg" alt="Binaural beats playlist">
+                </div>
+                <p class="resource-text">Spotify binaural beats tracks to listen to during practice</p>
+              </a>
             </div>
           </section>
         </div>
@@ -918,7 +942,10 @@
 
       const { hitCount, validTotal, percent } = calculateScore();
       const identifiedCorrectly = !!window._selectedIsTarget;
-      lastSessionScore = percent;
+
+      saveSessionResult();
+      addChartEntry(percent);
+      sessionSaved = true;
 
       progressHits.textContent = hitCount;
       progressTotal.textContent = validTotal;
@@ -993,7 +1020,7 @@
       progressFill.style.width = '0%';
     }
 
-    let lastSessionScore = null;
+    let sessionSaved = false;
 
     function aggregateChartData() {
       const raw = JSON.parse(localStorage.getItem('woo_chart_scores') || '[]');
@@ -1011,7 +1038,9 @@
         const avg = Math.round(d.scores.reduce((a, b) => a + b, 0) / d.scores.length);
         return { day: d.day, percent: avg };
       });
-      return all.slice(-7);
+      const frameWidth = document.querySelector('.phone-frame').offsetWidth;
+      const maxBars = frameWidth >= 500 ? 14 : 7;
+      return all.slice(-maxBars);
     }
 
     function renderChart(entries, animateLastBar) {
@@ -1051,10 +1080,17 @@
 
     function seedDummyChartData() {
       const existing = JSON.parse(localStorage.getItem('woo_chart_scores') || '[]');
-      if (existing.length > 0) return;
+      const existingKeys = new Set(existing.map(s => s.dateKey));
 
       const now = new Date();
       const dummyDays = [
+        { daysAgo: 42, percent: 25 },
+        { daysAgo: 39, percent: 33 },
+        { daysAgo: 36, percent: 42 },
+        { daysAgo: 33, percent: 28 },
+        { daysAgo: 30, percent: 50 },
+        { daysAgo: 27, percent: 35 },
+        { daysAgo: 24, percent: 60 },
         { daysAgo: 21, percent: 38 },
         { daysAgo: 18, percent: 48 },
         { daysAgo: 15, percent: 40 },
@@ -1064,21 +1100,33 @@
         { daysAgo: 2,  percent: 55 }
       ];
 
-      const seeds = dummyDays.map(d => {
+      const seeds = [];
+      dummyDays.forEach(d => {
         const date = new Date(now);
         date.setDate(date.getDate() - d.daysAgo);
-        return {
-          percent: d.percent,
-          day: date.getDate(),
-          dateKey: date.toISOString().slice(0, 10)
-        };
+        const dateKey = date.toISOString().slice(0, 10);
+        if (!existingKeys.has(dateKey)) {
+          seeds.push({
+            percent: d.percent,
+            day: date.getDate(),
+            dateKey: dateKey
+          });
+        }
       });
 
-      localStorage.setItem('woo_chart_scores', JSON.stringify(seeds));
+      if (seeds.length > 0) {
+        const merged = [...seeds, ...existing];
+        merged.sort((a, b) => a.dateKey.localeCompare(b.dateKey));
+        localStorage.setItem('woo_chart_scores', JSON.stringify(merged));
+      }
     }
 
     seedDummyChartData();
     renderChart(aggregateChartData(), false);
+
+    window.addEventListener('resize', () => {
+      renderChart(aggregateChartData(), false);
+    });
 
     function addChartEntry(percent) {
       const now = new Date();
@@ -1135,10 +1183,6 @@
     }
 
     function closeAllPages() {
-      if (lastSessionScore !== null) {
-        saveSessionResult();
-      }
-
       stopRecognition();
 
       const overlay = document.getElementById('page-overlay');
@@ -1158,6 +1202,7 @@
       reviewSkippedSelection = false;
       document.getElementById('review-target-loading').style.display = 'none';
       statTargetIcon.parentElement.style.display = '';
+      sessionSaved = false;
 
       overlay.style.transition = '';
       void overlay.offsetHeight;
@@ -1168,11 +1213,6 @@
         if (cleaned) return;
         cleaned = true;
         overlay.removeEventListener('transitionend', onFaded);
-
-        if (lastSessionScore !== null) {
-          addChartEntry(lastSessionScore);
-          lastSessionScore = null;
-        }
       };
       overlay.addEventListener('transitionend', onFaded);
       setTimeout(onFaded, 500);

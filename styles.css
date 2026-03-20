@@ -25,7 +25,8 @@ body {
 }
 
 .phone-frame {
-  width: 375px;
+  width: 100%;
+  max-width: 800px;
   height: 100vh;
   height: 100dvh;
   max-height: -webkit-fill-available;
@@ -258,10 +259,11 @@ body {
 }
 
 .bar-wrapper {
-  width: 16px;
+  flex: 1;
   height: 100%;
   display: flex;
   align-items: flex-end;
+  justify-content: center;
 }
 
 .bar {
@@ -283,11 +285,11 @@ body {
 
 .chart-x-labels span {
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   line-height: 20px;
   color: var(--text-primary);
-  width: 16px;
+  flex: 1;
   text-align: center;
 }
 
@@ -327,6 +329,9 @@ body {
   background: var(--card);
   border-radius: 18px;
   overflow: hidden;
+  text-decoration: none;
+  display: block;
+  color: inherit;
 }
 
 .resource-image {
@@ -831,6 +836,9 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+  max-width: 375px;
+  margin: 0 auto;
+  justify-items: center;
 }
 
 .photo-circle {
